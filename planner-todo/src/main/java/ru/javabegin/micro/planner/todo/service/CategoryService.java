@@ -6,6 +6,7 @@ import ru.javabegin.micro.planner.todo.repo.CategoryRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 
 // всегда нужно создавать отдельный класс Service для доступа к данным, даже если кажется,

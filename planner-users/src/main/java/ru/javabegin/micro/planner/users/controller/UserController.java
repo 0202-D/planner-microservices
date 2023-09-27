@@ -13,6 +13,7 @@ import ru.javabegin.micro.planner.users.service.UserService;
 
 import java.text.ParseException;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 
 /*
@@ -137,19 +138,21 @@ public class UserController {
     // получение объекта по id
     @PostMapping("/id")
     public ResponseEntity<User> findById(@RequestBody Long id) {
+        Optional<User> optionalUser = userService.findById(id);
 
-        User user = null;
 
         // можно обойтись и без try-catch, тогда будет возвращаться полная ошибка (stacktrace)
         // здесь показан пример, как можно обрабатывать исключение и отправлять свой текст/статус
         try {
-            user = userService.findById(id);
+            if (optionalUser.isPresent()) {
+                return ResponseEntity.ok(optionalUser.get());
+            }
         } catch (NoSuchElementException e) { // если объект не будет найден
             e.printStackTrace();
-            return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
+
         }
 
-        return ResponseEntity.ok(user);
+        return new ResponseEntity("id=" + id + " not found", HttpStatus.NOT_ACCEPTABLE);
     }
 
     // получение уникального объекта по email
@@ -169,7 +172,6 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
-
 
 
     // поиск по любым параметрам UserSearchValues
