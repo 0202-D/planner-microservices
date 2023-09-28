@@ -60,7 +60,7 @@ public class CategoryController {
         }
         if (userRestBuilder.isExists(category.getUserId())) {
             return ResponseEntity.ok(categoryService.add(category));
-        }// возвращаем добавленный объект с заполненным ID
+        }
         else {
             return new ResponseEntity("not found user by userId = " + category.getUserId(), HttpStatus.NOT_ACCEPTABLE);
         }

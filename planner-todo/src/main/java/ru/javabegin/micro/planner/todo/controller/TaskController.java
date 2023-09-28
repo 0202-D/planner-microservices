@@ -1,5 +1,6 @@
 package ru.javabegin.micro.planner.todo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.todo.search.TaskSearchValues;
 import ru.javabegin.micro.planner.todo.service.TaskService;
+import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -38,12 +40,14 @@ public class TaskController {
 
     public static final String ID_COLUMN = "id"; // имя столбца id
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
-
+    private final
+    UserRestBuilder userRestBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder) {
         this.taskService = taskService;
+        this.userRestBuilder = userRestBuilder;
     }
 
 
@@ -68,7 +72,12 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        return ResponseEntity.ok(taskService.add(task)); // возвращаем созданный объект со сгенерированным id
+        if (userRestBuilder.isExists(task.getUserId())) {
+            return ResponseEntity.ok(taskService.add(task));
+        }
+        else {
+            return new ResponseEntity("not found user by userId = " + task.getUserId(), HttpStatus.NOT_ACCEPTABLE);
+        }
 
     }
 
@@ -218,7 +227,6 @@ public class TaskController {
         return ResponseEntity.ok(result);
 
     }
-
 
 
 }

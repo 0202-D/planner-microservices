@@ -1,5 +1,6 @@
 package ru.javabegin.micro.planner.todo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
+import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,11 +35,14 @@ public class PriorityController {
 
     // доступ к данным из БД
     private PriorityService priorityService;
+    private final
+    UserRestBuilder userRestBuilder;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService) {
+    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder) {
         this.priorityService = priorityService;
+        this.userRestBuilder = userRestBuilder;
     }
 
 
@@ -66,8 +71,12 @@ public class PriorityController {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        // save работает как на добавление, так и на обновление
-        return ResponseEntity.ok(priorityService.add(priority));
+        if (userRestBuilder.isExists(priority.getUserId())) {
+            return ResponseEntity.ok(priorityService.add(priority));
+        }
+        else {
+            return new ResponseEntity("not found user by userId = " + priority.getUserId(), HttpStatus.NOT_ACCEPTABLE);
+        }
     }
 
 
