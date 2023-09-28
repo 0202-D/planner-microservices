@@ -1,11 +1,13 @@
-package ru.javabegin.micro.planner.utils.webclient;
+package ru.javabegin.micro.planner.utils.resttemplateandwebclient;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.javabegin.micro.planner.entity.User;
 
 @Component
-public class UserWebClientBuilder {
+@Primary
+public class UserWebClientBuilder implements IsExistChecker {
     private static final String url = "http://localhost:8765/planner-users/user/";
 
     public boolean isUserExists(Long userId) {

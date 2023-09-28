@@ -1,6 +1,5 @@
 package ru.javabegin.micro.planner.todo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
-import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -70,8 +69,7 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
-
-        if (userRestBuilder.isExists(priority.getUserId())) {
+        if (userRestBuilder.isUserExists(priority.getUserId())) {
             return ResponseEntity.ok(priorityService.add(priority));
         }
         else {

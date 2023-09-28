@@ -1,6 +1,5 @@
 package ru.javabegin.micro.planner.todo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
 import ru.javabegin.micro.planner.todo.search.CategorySearchValues;
 import ru.javabegin.micro.planner.todo.service.CategoryService;
-import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -58,7 +57,7 @@ public class CategoryController {
         if (category.getTitle() == null || category.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
-        if (userRestBuilder.isExists(category.getUserId())) {
+        if (userRestBuilder.isUserExists(category.getUserId())) {
             return ResponseEntity.ok(categoryService.add(category));
         }
         else {

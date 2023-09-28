@@ -1,7 +1,8 @@
-package ru.javabegin.micro.planner.utils.resttemplate;
+package ru.javabegin.micro.planner.utils.resttemplateandwebclient;
 
 
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -12,12 +13,13 @@ import org.springframework.web.client.RestTemplate;
 
 
 @Component
-public class UserRestBuilder {
+public class UserRestBuilder implements IsExistChecker {
     private static final String url = "http://localhost:8765/planner-users/user/";
 
-    public boolean isExists(long userIdd) {
+    @Override
+    public boolean isUserExists(Long userId) {
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<Long> request = new HttpEntity<>(userIdd);
+        HttpEntity<Long> request = new HttpEntity<>(userId);
         ResponseEntity<User> response = null;
         try {
             response = restTemplate.exchange(url + "/id", HttpMethod.POST, request, User.class);
@@ -30,5 +32,4 @@ public class UserRestBuilder {
         }
         return false;
     }
-
 }

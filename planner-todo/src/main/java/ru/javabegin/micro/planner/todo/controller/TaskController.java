@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.todo.search.TaskSearchValues;
 import ru.javabegin.micro.planner.todo.service.TaskService;
-import ru.javabegin.micro.planner.utils.resttemplate.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.IsExistChecker;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
 
 import java.text.ParseException;
 import java.util.Calendar;
@@ -40,14 +41,13 @@ public class TaskController {
 
     public static final String ID_COLUMN = "id"; // имя столбца id
     private final TaskService taskService; // сервис для доступа к данным (напрямую к репозиториям не обращаемся)
-    private final
-    UserRestBuilder userRestBuilder;
+    private final IsExistChecker isExistChecker;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder) {
+    public TaskController(TaskService taskService, UserRestBuilder userRestBuilder, IsExistChecker isExistChecker) {
         this.taskService = taskService;
-        this.userRestBuilder = userRestBuilder;
+        this.isExistChecker = isExistChecker;
     }
 
 
@@ -72,10 +72,9 @@ public class TaskController {
             return new ResponseEntity("missed param: title", HttpStatus.NOT_ACCEPTABLE);
         }
 
-        if (userRestBuilder.isExists(task.getUserId())) {
+        if (isExistChecker.isUserExists(task.getUserId())) {
             return ResponseEntity.ok(taskService.add(task));
-        }
-        else {
+        } else {
             return new ResponseEntity("not found user by userId = " + task.getUserId(), HttpStatus.NOT_ACCEPTABLE);
         }
 
