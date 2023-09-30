@@ -1,5 +1,6 @@
 package ru.javabegin.micro.planner.todo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.IsExistChecker;
 import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserWebClientBuilder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -37,11 +40,14 @@ public class PriorityController {
     private final
     UserRestBuilder userRestBuilder;
 
+    private final UserWebClientBuilder userWebClientBuilder;
+
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder) {
+    public PriorityController(PriorityService priorityService, UserRestBuilder userRestBuilder, UserWebClientBuilder userWebClientBuilder) {
         this.priorityService = priorityService;
         this.userRestBuilder = userRestBuilder;
+        this.userWebClientBuilder = userWebClientBuilder;
     }
 
 
@@ -69,10 +75,10 @@ public class PriorityController {
         if (priority.getColor() == null || priority.getColor().trim().length() == 0) {
             return new ResponseEntity("missed param: color", HttpStatus.NOT_ACCEPTABLE);
         }
+
         if (userRestBuilder.isUserExists(priority.getUserId())) {
             return ResponseEntity.ok(priorityService.add(priority));
-        }
-        else {
+        } else {
             return new ResponseEntity("not found user by userId = " + priority.getUserId(), HttpStatus.NOT_ACCEPTABLE);
         }
     }

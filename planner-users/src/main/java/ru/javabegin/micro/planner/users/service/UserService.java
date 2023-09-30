@@ -1,11 +1,13 @@
 package ru.javabegin.micro.planner.users.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.entity.User;
 import ru.javabegin.micro.planner.users.repo.UserRepository;
+import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserWebClientBuilder;
 
 import javax.transaction.Transactional;
 import java.util.Date;
@@ -20,11 +22,12 @@ import java.util.Optional;
 // если в методе возникнет исключение - все выполненные операции откатятся (Rollback)
 @Transactional
 public class UserService {
-
+    private final UserWebClientBuilder userWebClientBuilder;
     private final UserRepository repository; // сервис имеет право обращаться к репозиторию (БД)
 
-    public UserService(UserRepository repository) {
+    public UserService(UserRepository repository, UserWebClientBuilder userWebClientBuilder) {
         this.repository = repository;
+        this.userWebClientBuilder = userWebClientBuilder;
     }
 
     // возвращает только либо 0 либо 1 объект, т.к. email уникален для каждого пользователя
@@ -33,7 +36,10 @@ public class UserService {
     }
 
     public User add(User user) {
-        return repository.save(user); // метод save обновляет или создает новый объект, если его не было
+        User savedUser = repository.save(user); // метод save обновляет или создает новый объект, если его не было
+        userWebClientBuilder.initUserData(user.getId())
+                .subscribe(result-> System.out.println("user populated "+result));
+        return savedUser;
     }
 
     public User update(User user) {
