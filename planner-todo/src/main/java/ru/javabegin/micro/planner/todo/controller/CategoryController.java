@@ -27,7 +27,7 @@ import java.util.NoSuchElementException;
 public class CategoryController {
 
     // доступ к данным из БД
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
     private final
     UserRestBuilder userRestBuilder;
 

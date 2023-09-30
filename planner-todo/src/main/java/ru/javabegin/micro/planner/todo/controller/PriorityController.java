@@ -1,6 +1,5 @@
 package ru.javabegin.micro.planner.todo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Priority;
 import ru.javabegin.micro.planner.todo.search.PrioritySearchValues;
 import ru.javabegin.micro.planner.todo.service.PriorityService;
-import ru.javabegin.micro.planner.utils.resttemplateandwebclient.IsExistChecker;
 import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
 import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserWebClientBuilder;
 
@@ -36,7 +34,7 @@ import java.util.NoSuchElementException;
 public class PriorityController {
 
     // доступ к данным из БД
-    private PriorityService priorityService;
+    private final PriorityService priorityService;
     private final
     UserRestBuilder userRestBuilder;
 
