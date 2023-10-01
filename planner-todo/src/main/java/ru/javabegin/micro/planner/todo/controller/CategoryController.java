@@ -1,10 +1,12 @@
 package ru.javabegin.micro.planner.todo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.javabegin.micro.planner.entity.Category;
+import ru.javabegin.micro.planner.todo.feign.UserFeignClient;
 import ru.javabegin.micro.planner.todo.search.CategorySearchValues;
 import ru.javabegin.micro.planner.todo.service.CategoryService;
 import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserRestBuilder;
@@ -30,12 +32,14 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final
     UserRestBuilder userRestBuilder;
+    private final UserFeignClient userFeignClient;
 
     // используем автоматическое внедрение экземпляра класса через конструктор
     // не используем @Autowired ля переменной класса, т.к. "Field injection is not recommended "
-    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder) {
+    public CategoryController(CategoryService categoryService, UserRestBuilder userRestBuilder, UserFeignClient userFeignClient) {
         this.categoryService = categoryService;
         this.userRestBuilder = userRestBuilder;
+        this.userFeignClient = userFeignClient;
     }
 
     @PostMapping("/all")
@@ -57,10 +61,9 @@ public class CategoryController {
         if (category.getTitle() == null || category.getTitle().trim().length() == 0) {
             return new ResponseEntity("missed param: title MUST be not null", HttpStatus.NOT_ACCEPTABLE);
         }
-        if (userRestBuilder.isUserExists(category.getUserId())) {
+        if (userFeignClient.findUserById(category.getUserId()) != null) {
             return ResponseEntity.ok(categoryService.add(category));
-        }
-        else {
+        } else {
             return new ResponseEntity("not found user by userId = " + category.getUserId(), HttpStatus.NOT_ACCEPTABLE);
         }
     }
