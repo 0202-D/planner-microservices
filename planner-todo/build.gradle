@@ -26,6 +26,8 @@ dependencies {
     implementation 'ru.javabegin.micro.planner:planner-entity'
     implementation 'ru.javabegin.micro.planner:planner-utils'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign', version: '1.4.7.RELEASE'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
+
 
 
 
