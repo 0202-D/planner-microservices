@@ -1,0 +1,10 @@
+package ru.javabegin.micro.planner.users.mq;
+
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.messaging.MessageChannel;
+
+public interface TodoBinding {
+    String OUTPUT_CHANNEL = "todoOutPutChannel";
+    @Output(OUTPUT_CHANNEL)
+    MessageChannel todoOutputChannel();
+}

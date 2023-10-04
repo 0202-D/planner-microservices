@@ -1,16 +1,14 @@
 package ru.javabegin.micro.planner.users.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.javabegin.micro.planner.entity.Task;
 import ru.javabegin.micro.planner.entity.User;
+import ru.javabegin.micro.planner.users.mq.MessageProducer;
 import ru.javabegin.micro.planner.users.repo.UserRepository;
 import ru.javabegin.micro.planner.utils.resttemplateandwebclient.UserWebClientBuilder;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.Optional;
 
 // всегда нужно создавать отдельный класс Service для доступа к данным, даже если кажется,
@@ -24,10 +22,12 @@ import java.util.Optional;
 public class UserService {
     private final UserWebClientBuilder userWebClientBuilder;
     private final UserRepository repository; // сервис имеет право обращаться к репозиторию (БД)
+    private final MessageProducer messageProducer;
 
-    public UserService(UserRepository repository, UserWebClientBuilder userWebClientBuilder) {
+    public UserService(UserRepository repository, UserWebClientBuilder userWebClientBuilder, MessageProducer messageProducer) {
         this.repository = repository;
         this.userWebClientBuilder = userWebClientBuilder;
+        this.messageProducer = messageProducer;
     }
 
     // возвращает только либо 0 либо 1 объект, т.к. email уникален для каждого пользователя
@@ -39,6 +39,7 @@ public class UserService {
         User savedUser = repository.save(user); // метод save обновляет или создает новый объект, если его не было
         userWebClientBuilder.initUserData(user.getId())
                 .subscribe(result-> System.out.println("user populated "+result));
+         messageProducer.initUserData(user.getId());
         return savedUser;
     }
 
