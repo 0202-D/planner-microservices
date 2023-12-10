@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes # Разрешить анонимный доступ (только для целей разработки)
+    ports:
+      - '2181:2181' # Порт для zookeeper
+
+  kafka:
+    image: 'bitnami/kafka:latest'
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 # указываем адрес zookeeper
+      - ALLOW_PLAINTEXT_LISTENER=yes # Разрешить прослушивание по простому текстовому протоколу (только для целей разработки)
+    ports:
+      - '9092:9092' # Порт для kafka
+    depends_on:
+      - zookeeper # Указываем, что kafka зависит от zookeeper
+
+  spring-app:
+    build: .
+    ports:
+      - '8080:8080' # Порт для вашего Spring Boot приложения
+    environment:
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092 # Указываем адрес сервера Kafka для вашего Spring Boot приложения
+    depends_on:
+      - kafka # Указываем, что наше приложение зависит от kafka
